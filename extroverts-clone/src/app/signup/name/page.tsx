@@ -48,8 +48,7 @@ export default function NamePage() {
     <WizardShell
       step="name"
       stepNumber={2}
-      heading="Name, please, for the party check!"
-      subtext="Shown to other members on your profile — and it can't be changed later, so make it count."
+      heading={'"Name, please, for the party check!"'}
     >
       <form onSubmit={handleSubmit} noValidate className="flex flex-1 flex-col">
         <Input
@@ -57,7 +56,6 @@ export default function NamePage() {
           name="name"
           autoFocus={!locked}
           autoComplete="name"
-          placeholder="Alex Fernandes"
           maxLength={LIMITS.name}
           value={name}
           error={error}
@@ -65,17 +63,17 @@ export default function NamePage() {
           counter={locked ? undefined : { value: name.length, max: LIMITS.name }}
           hint={
             locked
-              ? "Your name is locked in — see you at the party."
-              : "Letters, spaces and basic punctuation only."
+              ? "Your name is locked in — it can't be changed."
+              : "This is the name shown as on members and requests. Cannot be changed later."
           }
           onChange={(e) => setName(e.target.value)}
-          onBlur={() => setTouched(true)}
+          onBlur={() => name.length > 0 && setTouched(true)}
           className={locked ? "opacity-60" : ""}
         />
 
-        <div className="mt-auto flex flex-col gap-3 pt-8">
+        <div className="mt-auto flex flex-col gap-4 pt-8">
           <Button type="submit" loading={loading} disabled={!isValid}>
-            {loading ? "Saving..." : "Continue"}
+            Next
           </Button>
           <Button
             type="button"

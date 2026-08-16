@@ -38,50 +38,49 @@ export default function EmailPage() {
     setField("email", trimmed);
     setField("newsletter", newsletter);
     setField("otp", "");
-    toast.success(`Code sent to ${trimmed}`);
     router.push("/signup/otp");
   };
 
   return (
-    <WizardShell
-      step="email"
-      heading="What's your email?"
-      subtext="We'll send you a one-time code to verify it. No passwords here."
-    >
-      <form onSubmit={handleSubmit} noValidate className="flex flex-1 flex-col">
-        <Input
-          label="Email"
-          name="email"
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          autoFocus
-          placeholder="you@example.com"
-          value={email}
-          error={error}
-          onChange={(e) => setEmail(e.target.value)}
-          onBlur={() => setTouched(true)}
-        />
-
-        <label className="mt-2 flex cursor-pointer items-start gap-3 text-sm text-text-secondary">
-          <input
-            type="checkbox"
-            checked={newsletter}
-            onChange={(e) => setNewsletter(e.target.checked)}
-            className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer appearance-none rounded border border-border-default bg-bg-elevated transition-colors checked:border-accent checked:bg-accent"
+    <WizardShell step="email">
+      <div className="mt-16 flex flex-col">
+        <h1 className="mb-6 text-[26px] font-bold">Enter your email</h1>
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col">
+          <Input
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoFocus
+            placeholder="Email"
+            aria-label="Email"
+            value={email}
+            error={error}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => email.length > 0 && setTouched(true)}
           />
-          <span>
-            Keep me posted about events near me{" "}
-            <span className="text-text-muted">(optional)</span>
-          </span>
-        </label>
 
-        <div className="mt-auto pt-8">
-          <Button type="submit" loading={loading} disabled={!isValid}>
-            {loading ? "Sending code..." : "Proceed"}
+          <Button type="submit" loading={loading} disabled={!isValid} className="mt-1">
+            Proceed
           </Button>
-        </div>
-      </form>
+
+          <label className="mt-4 flex cursor-pointer items-center gap-3 text-[15px] text-white">
+            <input
+              type="checkbox"
+              checked={newsletter}
+              onChange={(e) => setNewsletter(e.target.checked)}
+              className="h-[22px] w-[22px] shrink-0 cursor-pointer appearance-none rounded border-2 border-neutral-500 bg-transparent transition-colors checked:border-white checked:bg-white"
+              style={{
+                backgroundImage: newsletter
+                  ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'%3E%3Cpath d='M12.7 4.7a1 1 0 0 0-1.4-1.4L6.5 8.09 4.7 6.3a1 1 0 0 0-1.4 1.4l2.5 2.5a1 1 0 0 0 1.4 0l5.5-5.5z'/%3E%3C/svg%3E\")"
+                  : undefined,
+                backgroundSize: "100%",
+              }}
+            />
+            <span>I&apos;d like to subscribe to your newsletter</span>
+          </label>
+        </form>
+      </div>
     </WizardShell>
   );
 }

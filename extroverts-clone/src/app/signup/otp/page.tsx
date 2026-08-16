@@ -3,28 +3,41 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import WizardShell from "@/components/wizard/WizardShell";
+import { useWizard } from "@/context/WizardContext";
+import Logo from "@/components/ui/Logo";
 import OtpInput from "@/components/ui/OtpInput";
 import Button from "@/components/ui/Button";
-import { useWizard } from "@/context/WizardContext";
 import { sendOtp, verifyOtp } from "@/lib/mockApi";
 
 const RESEND_COOLDOWN = 30;
 
+/**
+ * OTP screen — centered logo, "ENTER OTP" label, 6 boxes, Resend link,
+ * VERIFY / GO BACK buttons and the "sent to <email>" note, matching the
+ * reference app. Improvements: discrete boxes with paste support and a
+ * visible resend countdown.
+ */
 export default function OtpPage() {
   const router = useRouter();
-  const { state, setField } = useWizard();
+  const { state, setField, isStepAllowed } = useWizard();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
 
+  const allowed = isStepAllowed("otp");
+  useEffect(() => {
+    if (!allowed) router.replace("/signup/email");
+  }, [allowed, router]);
+
   useEffect(() => {
     if (cooldown <= 0) return;
     const t = setInterval(() => setCooldown((c) => c - 1), 1000);
     return () => clearInterval(t);
   }, [cooldown]);
+
+  if (!allowed) return null;
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +55,6 @@ export default function OtpPage() {
     }
     setField("otp", code);
     setField("isVerified", true);
-    toast.success("Email verified!");
     router.push("/signup/username");
   };
 
@@ -62,45 +74,47 @@ export default function OtpPage() {
   };
 
   return (
-    <WizardShell
-      step="otp"
-      heading="Check your inbox"
-      subtext={`We sent a 6-digit code to ${state.email || "your email"}. Enter it below to verify.`}
-    >
-      <form onSubmit={handleVerify} className="flex flex-1 flex-col">
-        <OtpInput value={code} onChange={(v) => { setCode(v); setError(null); }} error={!!error} disabled={verifying} />
+    <main className="flex flex-1 flex-col pb-6 pt-8 animate-fade-up">
+      <div className="flex justify-center">
+        <Logo size={44} />
+      </div>
 
-        <div className="mt-3 min-h-[18px]">
-          {error && (
-            <p role="alert" className="text-xs text-error">
-              {error}
-            </p>
-          )}
-        </div>
+      <form onSubmit={handleVerify} className="mt-12 flex flex-1 flex-col">
+        <p className="mb-4 text-[15px] font-medium uppercase tracking-[0.02em] text-neutral-200">
+          Enter OTP
+        </p>
 
-        <div className="mt-4 flex items-center gap-1 text-sm text-text-secondary">
-          <span>Didn&apos;t get it?</span>
+        <OtpInput
+          value={code}
+          onChange={(v) => {
+            setCode(v);
+            setError(null);
+          }}
+          error={!!error}
+          disabled={verifying}
+        />
+
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <p role="alert" className="min-h-[18px] text-[13px] text-error">
+            {error ?? ""}
+          </p>
           <button
             type="button"
             onClick={handleResend}
             disabled={cooldown > 0 || resending}
-            className="font-semibold text-white underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-text-muted disabled:no-underline"
+            className="shrink-0 text-sm text-neutral-400 underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:text-neutral-600 disabled:no-underline"
           >
             {resending
               ? "Resending..."
               : cooldown > 0
-                ? `Resend in ${cooldown}s`
-                : "Resend code"}
+                ? `Resend OTP in ${cooldown}s`
+                : "Resend OTP"}
           </button>
         </div>
 
-        <p className="mt-2 text-xs text-text-muted">
-          Demo tip: the mock verification code is <span className="font-semibold text-text-secondary">123456</span>.
-        </p>
-
-        <div className="mt-auto flex flex-col gap-3 pt-8">
+        <div className="mt-8 flex flex-col gap-4">
           <Button type="submit" loading={verifying} disabled={code.length !== 6}>
-            {verifying ? "Verifying..." : "Verify"}
+            Verify
           </Button>
           <Button
             type="button"
@@ -110,7 +124,14 @@ export default function OtpPage() {
             Go Back
           </Button>
         </div>
+
+        <p className="mt-5 text-center text-[13px] text-neutral-500">
+          ⓘ A 6-digit OTP has been sent to {state.email || "your email"}.
+        </p>
+        <p className="mt-2 text-center text-xs text-neutral-600">
+          Demo tip: the mock verification code is 123456.
+        </p>
       </form>
-    </WizardShell>
+    </main>
   );
 }

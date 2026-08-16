@@ -11,13 +11,13 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const base =
-  "w-full h-12 rounded-lg text-[15px] font-semibold tracking-wide transition-colors duration-150 flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-40 disabled:pointer-events-none select-none";
+  "w-full h-[52px] rounded-lg text-[15px] font-semibold uppercase tracking-wide transition-colors duration-150 flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-40 disabled:pointer-events-none select-none";
 
 const variants: Record<Variant, string> = {
   primary: "bg-white text-black hover:bg-neutral-200 active:bg-neutral-300",
   secondary:
-    "bg-transparent text-white border border-border-default hover:bg-bg-elevated active:bg-bg-elevated-2",
-  ghost: "bg-transparent text-text-secondary hover:text-white",
+    "bg-[#1A1A1A] text-white border border-[#2E2E2E] hover:bg-[#242424] active:bg-[#2A2A2A]",
+  ghost: "bg-transparent text-text-secondary hover:text-white normal-case",
 };
 
 export default function Button({
@@ -35,8 +35,7 @@ export default function Button({
       aria-busy={loading}
       {...rest}
     >
-      {loading && <Spinner />}
-      {children}
+      {loading ? <Spinner /> : children}
     </button>
   );
 }

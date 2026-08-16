@@ -15,11 +15,11 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
 ) {
   const inputId = id || rest.name || label;
   return (
-    <div className="flex w-full flex-col gap-1.5">
+    <div className="flex w-full flex-col gap-2">
       {label && (
         <label
           htmlFor={inputId}
-          className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary"
+          className="text-[13px] font-medium uppercase tracking-[0.02em] text-neutral-300"
         >
           {label}
         </label>
@@ -29,27 +29,27 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         id={inputId}
         aria-invalid={!!error}
         aria-describedby={error ? `${inputId}-error` : undefined}
-        className={`h-12 w-full rounded-lg border bg-bg-elevated px-4 text-[15px] text-white placeholder:text-text-muted outline-none transition-colors duration-150 ${
+        className={`h-[54px] w-full rounded-lg border bg-transparent px-4 text-[15px] text-white placeholder:uppercase placeholder:text-neutral-500 outline-none transition-colors duration-150 ${
           error
             ? "border-error focus:border-error"
-            : "border-border-default focus:border-accent"
+            : "border-neutral-600 focus:border-white"
         } ${className}`}
         {...rest}
       />
-      <div className="flex min-h-[16px] items-start justify-between gap-2">
+      <div className="flex min-h-[18px] items-start justify-between gap-2">
         {error ? (
-          <p id={`${inputId}-error`} role="alert" className="text-xs text-error">
+          <p id={`${inputId}-error`} role="alert" className="text-[13px] text-error">
             {error}
           </p>
         ) : hint ? (
-          <p className="text-xs text-text-muted">{hint}</p>
+          <p className="text-[14px] leading-snug text-neutral-400">{hint}</p>
         ) : (
           <span />
         )}
         {counter && (
           <span
             className={`shrink-0 text-xs tabular-nums ${
-              counter.value > counter.max ? "text-error" : "text-text-muted"
+              counter.value > counter.max ? "text-error" : "text-neutral-500"
             }`}
           >
             {counter.value}/{counter.max}

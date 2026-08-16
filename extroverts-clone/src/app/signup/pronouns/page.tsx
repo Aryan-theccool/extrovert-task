@@ -50,7 +50,6 @@ export default function PronounsPage() {
       step="pronouns"
       stepNumber={4}
       heading="Which pronouns feel right for you?"
-      subtext="Pick a suggestion or type your own — free text is welcome."
     >
       <form onSubmit={handleSubmit} noValidate className="flex flex-1 flex-col">
         <div className="relative">
@@ -60,19 +59,18 @@ export default function PronounsPage() {
             autoFocus
             autoComplete="off"
             spellCheck={false}
-            placeholder="they/them/theirs"
+            placeholder="he/him/his"
             maxLength={LIMITS.pronouns}
             value={pronouns}
             error={error}
-            counter={{ value: pronouns.length, max: LIMITS.pronouns }}
+            hint="Select the pronouns that feel right for you."
             onChange={(e) => {
               setPronouns(e.target.value);
               setShowSuggestions(true);
             }}
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => {
-              setTouched(true);
-              // Delay so a click on a suggestion still registers
+              if (pronouns.length > 0) setTouched(true);
               setTimeout(() => setShowSuggestions(false), 150);
             }}
           />
@@ -80,7 +78,7 @@ export default function PronounsPage() {
             <ul
               role="listbox"
               aria-label="Pronoun suggestions"
-              className="absolute left-0 right-0 top-[84px] z-10 overflow-hidden rounded-lg border border-border-default bg-bg-elevated-2 shadow-xl"
+              className="absolute left-0 right-0 top-[86px] z-10 overflow-hidden rounded-lg border border-neutral-700 bg-[#1A1A1A] shadow-xl"
             >
               {suggestions.map((s) => (
                 <li key={s}>
@@ -93,7 +91,7 @@ export default function PronounsPage() {
                       setPronouns(s);
                       setShowSuggestions(false);
                     }}
-                    className="w-full px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-white focus-visible:bg-bg-elevated focus-visible:text-white focus-visible:outline-none"
+                    className="w-full px-4 py-3 text-left text-sm text-neutral-300 transition-colors hover:bg-[#242424] hover:text-white focus-visible:bg-[#242424] focus-visible:text-white focus-visible:outline-none"
                   >
                     {s}
                   </button>
@@ -103,9 +101,9 @@ export default function PronounsPage() {
           )}
         </div>
 
-        <div className="mt-auto flex flex-col gap-3 pt-8">
+        <div className="mt-auto flex flex-col gap-4 pt-8">
           <Button type="submit" loading={loading} disabled={!isValid}>
-            {loading ? "Saving..." : "Continue"}
+            Next
           </Button>
           <Button type="button" variant="secondary" onClick={() => router.push("/signup/dob")}>
             Back

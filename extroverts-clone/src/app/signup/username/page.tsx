@@ -39,12 +39,7 @@ export default function UsernamePage() {
   };
 
   return (
-    <WizardShell
-      step="username"
-      stepNumber={1}
-      heading="Create a username that fits your vibe!"
-      subtext="This is your handle — other members will find you by it."
-    >
+    <WizardShell step="username" stepNumber={1} heading="Create a username that fits your vibe!">
       <form onSubmit={handleSubmit} noValidate className="flex flex-1 flex-col">
         <Input
           label="Username"
@@ -52,19 +47,18 @@ export default function UsernamePage() {
           autoFocus
           autoComplete="off"
           spellCheck={false}
-          placeholder="party.animal"
           maxLength={LIMITS.username}
           value={username}
           error={error}
           counter={{ value: username.length, max: LIMITS.username }}
-          hint="Letters, numbers, dots and underscores."
+          hint="All your Superlatives and Invites will come your way with this name, so make it unforgettable!"
           onChange={(e) => setUsername(e.target.value)}
-          onBlur={() => setTouched(true)}
+          onBlur={() => username.length > 0 && setTouched(true)}
         />
 
-        <div className="mt-auto flex flex-col gap-3 pt-8">
+        <div className="mt-auto flex flex-col gap-4 pt-8">
           <Button type="submit" loading={loading} disabled={!isValid}>
-            {loading ? "Saving..." : "Continue"}
+            Next
           </Button>
           <Button type="button" variant="secondary" onClick={() => router.push("/signup/otp")}>
             Back

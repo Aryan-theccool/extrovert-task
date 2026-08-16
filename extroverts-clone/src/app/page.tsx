@@ -1,46 +1,91 @@
-import Link from "next/link";
-import PhoneFrame from "@/components/layout/PhoneFrame";
+"use client";
 
-/** Landing / splash screen — logo, gradient blob, tagline, entry CTA. */
-export default function SplashPage() {
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import PhoneFrame from "@/components/layout/PhoneFrame";
+import HomeFeed from "@/components/home/HomeFeed";
+import Logo from "@/components/ui/Logo";
+
+/**
+ * Landing mechanism replicated from the reference app:
+ * 1. Brief black splash with the "E·" logo.
+ * 2. Locked (guest) home feed — browsable, but any Join-style action
+ *    opens the "YOU NEED AN ACCOUNT" bottom sheet.
+ * 3. GET STARTED → Terms & Conditions → signup wizard.
+ */
+export default function LandingPage() {
+  const router = useRouter();
+  const [splash, setSplash] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setSplash(false), 1400);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (splash) {
+    return (
+      <PhoneFrame>
+        <main className="flex flex-1 items-center justify-center">
+          <div className="animate-pop-in">
+            <Logo size={72} />
+          </div>
+        </main>
+      </PhoneFrame>
+    );
+  }
+
   return (
     <PhoneFrame>
-      <main className="relative flex flex-1 flex-col items-center justify-between overflow-hidden py-14">
-        {/* Wordmark */}
-        <div className="z-10 mt-16 flex flex-col items-center gap-3 animate-fade-up">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-gradient-start to-gradient-end text-5xl font-bold shadow-[0_0_60px_rgba(233,30,140,0.35)]">
-            E
-          </div>
-          <span className="text-lg font-semibold tracking-[0.35em]">
-            EXTROVERTS
-          </span>
-        </div>
+      <HomeFeed member={null} onJoin={() => setModalOpen(true)} />
 
-        {/* Gradient blob */}
+      {/* YOU NEED AN ACCOUNT bottom sheet */}
+      {modalOpen && (
         <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-[-120px] left-1/2 h-[340px] w-[340px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-gradient-start to-gradient-end opacity-60 blur-[90px] animate-blob"
-        />
-
-        <div className="z-10 flex w-full flex-col items-center gap-6">
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-[28px] font-bold leading-tight tracking-[-0.02em]">
-              AN APP ONLY
-              <br />
-              FOR EXTROVERTS
-            </h1>
-            <p className="text-xs italic text-text-secondary">
-              introverts, proceed at your own risk.
-            </p>
-          </div>
-          <Link
-            href="/terms"
-            className="flex h-12 w-full items-center justify-center rounded-lg bg-white text-[15px] font-semibold text-black transition-colors hover:bg-neutral-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70"
+          onClick={() => setModalOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-label="You need an account"
+            className="w-full max-w-[420px] rounded-t-2xl bg-[#161616] px-5 pb-8 pt-3 animate-fade-up"
+            onClick={(e) => e.stopPropagation()}
           >
-            GET STARTED
-          </Link>
+            <div aria-hidden className="mx-auto mb-4 h-1 w-10 rounded-full bg-neutral-500" />
+            <div className="flex items-center justify-between">
+              <h2 className="text-[22px] font-bold uppercase tracking-wide">
+                You need an account
+              </h2>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={() => setModalOpen(false)}
+                className="p-1 text-neutral-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mt-4 text-center text-[15px] leading-relaxed text-neutral-300">
+              Create an account to join events, earn HVTs, and party with
+              extroverts near you- all for free!
+            </p>
+            <div className="mt-6 flex flex-col gap-3">
+              <button
+                onClick={() => router.push("/terms")}
+                className="h-[52px] w-full rounded-lg bg-white text-[15px] font-semibold uppercase tracking-wide text-black transition-colors hover:bg-neutral-200"
+              >
+                Get Started
+              </button>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="h-[52px] w-full rounded-lg border border-neutral-600 text-[15px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-neutral-900"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
+      )}
     </PhoneFrame>
   );
 }
