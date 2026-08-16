@@ -21,10 +21,17 @@ const MANIFESTO: { text: string; accent?: string }[][] = [
 /** Manifesto + optional invite code screen, matching the reference app. */
 export default function InvitePage() {
   const router = useRouter();
-  const { setField } = useWizard();
+  const { setField, isStepAllowed } = useWizard();
   const [code, setCode] = useState("");
   const [warning, setWarning] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Check if user is allowed to be on this page
+  const allowed = isStepAllowed("invite");
+  if (!allowed) {
+    router.replace("/signup/email");
+    return null;
+  }
 
   const proceed = () => router.push("/signup/success");
 
@@ -56,7 +63,7 @@ export default function InvitePage() {
   };
 
   return (
-    <WizardShell step="invite" stepNumber={4}>
+    <WizardShell step="invite">
       <form onSubmit={handleSubmit} noValidate className="flex flex-1 flex-col">
         <div className="mb-8 mt-4 flex flex-col gap-1.5 text-[19px] font-bold leading-relaxed tracking-[0.01em]">
           {MANIFESTO.map((line, i) => (

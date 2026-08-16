@@ -15,9 +15,9 @@ import { computeAge } from "@/lib/age";
  */
 export default function ReviewPage() {
   const router = useRouter();
-  const { state, isStepAllowed } = useWizard();
+  const { state, isStepAllowed, dispatch } = useWizard();
 
-  const allowed = isStepAllowed("pronouns");
+  const allowed = isStepAllowed("review");
   if (!allowed) {
     router.replace("/signup/email");
     return null;
@@ -32,6 +32,11 @@ export default function ReviewPage() {
     { label: "Age", value: age ? `${age} years old` : "—" },
     { label: "Pronouns", value: state.pronouns },
   ];
+
+  const handleConfirm = () => {
+    dispatch({ type: "COMPLETE_STEP", step: "review" });
+    router.push("/signup/invite");
+  };
 
   return (
     <WizardShell step="pronouns" stepNumber={4} heading="Review your profile">
@@ -67,7 +72,7 @@ export default function ReviewPage() {
         </div>
 
         <div className="mt-auto flex flex-col gap-4 pt-8">
-          <Button onClick={() => router.push("/signup/invite")}>
+          <Button onClick={handleConfirm}>
             Confirm & Continue
           </Button>
           <Button
