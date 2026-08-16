@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import HomeFeed from "@/components/home/HomeFeed";
 import { useWizard } from "@/context/WizardContext";
 import { computeAge } from "@/lib/age";
@@ -96,7 +97,17 @@ export default function SuccessPage() {
           ) : (
             <HomeFeed
               member={{ name: firstName, tokens: 0 }}
-              onJoin={() => setShowProfile(true)}
+              onJoin={() =>
+                toast.success("You're on the list! See you at the party. 🎉")
+              }
+              activeTab="home"
+              onNavigate={(tab) => {
+                if (tab === "profile") setShowProfile(true);
+                else if (tab !== "home")
+                  toast("Chats and event hosting are outside this demo's scope.", {
+                    description: "The assessment covers the signup wizard only.",
+                  });
+              }}
             />
           )}
 

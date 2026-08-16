@@ -129,7 +129,15 @@ export default function LandingPage() {
 
   return (
     <PhoneFrame>
-      <HomeFeed member={null} onJoin={() => setModalOpen(true)} />
+      <HomeFeed
+        member={null}
+        onJoin={() => setModalOpen(true)}
+        activeTab="home"
+        onNavigate={(tab) => {
+          // Guests hit the account gate on any write-style tab, like the app
+          if (tab !== "home") setModalOpen(true);
+        }}
+      />
 
       {/* YOU NEED AN ACCOUNT bottom sheet */}
       {modalOpen && (

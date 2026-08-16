@@ -2,6 +2,9 @@
 
 import React from "react";
 import Logo from "@/components/ui/Logo";
+import { HomeIcon, ChatIcon, CreateIcon, ProfileIcon } from "./NavIcons";
+
+export type NavTab = "home" | "chats" | "create" | "profile";
 
 interface EventCard {
   title: string;
@@ -49,6 +52,10 @@ interface Props {
     tokens: number;
   } | null;
   onJoin: () => void;
+  /** Which bottom-nav tab is highlighted. */
+  activeTab?: NavTab;
+  /** Called when a bottom-nav tab is tapped. Guests get the account gate. */
+  onNavigate?: (tab: NavTab) => void;
 }
 
 /**
@@ -56,7 +63,12 @@ interface Props {
  * YOUR CLUB card (Bronze), Honorary Vibe Tokens banner, event cards with
  * host, category chip, time/date/location fields and JOIN / VIEW FLYER.
  */
-export default function HomeFeed({ member = null, onJoin }: Props) {
+export default function HomeFeed({
+  member = null,
+  onJoin,
+  activeTab = "home",
+  onNavigate,
+}: Props) {
   return (
     <div className="flex min-h-dvh flex-col">
       {/* Header */}
@@ -149,13 +161,32 @@ export default function HomeFeed({ member = null, onJoin }: Props) {
       {/* Bottom nav */}
       <nav
         aria-label="Main"
-        className="fixed bottom-0 left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 border-t border-neutral-800 bg-black/95 px-10 py-4 backdrop-blur"
+        className="fixed bottom-0 left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 border-t border-neutral-800 bg-black/95 px-6 py-2 backdrop-blur"
       >
-        <div className="flex items-center justify-between text-2xl">
-          <span aria-label="Home">🏠</span>
-          <span aria-label="Chats" className="opacity-50">💬</span>
-          <span aria-label="Create" className="opacity-50">➕</span>
-          <span aria-label="Profile" className="opacity-50">👤</span>
+        <div className="flex items-center justify-between">
+          {(
+            [
+              { tab: "home", label: "Home", Icon: HomeIcon },
+              { tab: "chats", label: "Chats", Icon: ChatIcon },
+              { tab: "create", label: "Create", Icon: CreateIcon },
+              { tab: "profile", label: "Profile", Icon: ProfileIcon },
+            ] as { tab: NavTab; label: string; Icon: typeof HomeIcon }[]
+          ).map(({ tab, label, Icon }) => (
+            <button
+              key={tab}
+              type="button"
+              aria-label={label}
+              aria-current={activeTab === tab ? "page" : undefined}
+              onClick={() => onNavigate?.(tab)}
+              className={`flex h-12 w-12 items-center justify-center rounded-lg transition-colors ${
+                activeTab === tab
+                  ? "text-white"
+                  : "text-neutral-500 hover:text-neutral-300"
+              }`}
+            >
+              <Icon className="h-[26px] w-[26px]" />
+            </button>
+          ))}
         </div>
       </nav>
     </div>
