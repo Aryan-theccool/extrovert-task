@@ -27,7 +27,7 @@ export default function ProfileView({
 }: Props) {
   const firstName = (name || "You").split(" ")[0];
   const demoToast = (what: string) =>
-    toast(`${what} is a post-onboarding feature — outside the wizard scope.`);
+    toast(`${what} is available after signup (out of scope for this demo).`);
 
   return (
     <div className="animate-fade-up pb-28">
