@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useWizard } from "@/context/WizardContext";
 import Logo from "@/components/ui/Logo";
 import OtpInput from "@/components/ui/OtpInput";
+import OtpNotification from "@/components/ui/OtpNotification";
 import Button from "@/components/ui/Button";
 import { sendOtp, verifyOtp } from "@/lib/mockApi";
 
@@ -25,6 +26,7 @@ export default function OtpPage() {
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
+  const [notifKey, setNotifKey] = useState(0);
 
   const allowed = isStepAllowed("otp");
   useEffect(() => {
@@ -68,6 +70,7 @@ export default function OtpPage() {
       return;
     }
     toast.success("A fresh code is on its way.");
+    setNotifKey((k) => k + 1); // re-trigger the inbox notification
     setCooldown(RESEND_COOLDOWN);
     setCode("");
     setError(null);
@@ -75,6 +78,9 @@ export default function OtpPage() {
 
   return (
     <main className="flex flex-1 flex-col pb-6 pt-8 animate-fade-up">
+      {/* Simulated inbox notification carrying the mock OTP */}
+      <OtpNotification key={notifKey} email={state.email} delay={notifKey === 0 ? 1600 : 900} />
+
       <div className="flex justify-center">
         <Logo size={44} />
       </div>
@@ -127,9 +133,6 @@ export default function OtpPage() {
 
         <p className="mt-5 text-center text-[13px] text-neutral-500">
           ⓘ A 6-digit OTP has been sent to {state.email || "your email"}.
-        </p>
-        <p className="mt-2 text-center text-xs text-neutral-600">
-          Demo tip: the mock verification code is 123456.
         </p>
       </form>
     </main>
