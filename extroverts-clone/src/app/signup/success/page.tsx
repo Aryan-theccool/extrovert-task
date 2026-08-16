@@ -3,21 +3,26 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import HomeFeed from "@/components/home/HomeFeed";
+import HomeFeed, { type NavTab } from "@/components/home/HomeFeed";
+import ChatsView from "@/components/home/ChatsView";
+import HostView from "@/components/home/HostView";
+import ProfileView from "@/components/home/ProfileView";
+import { HomeIcon, ChatIcon, CreateIcon, ProfileIcon } from "@/components/home/NavIcons";
 import { useWizard } from "@/context/WizardContext";
 import { computeAge } from "@/lib/age";
 
 /**
- * Success state matching the reference recording: after SIGN UP the user
- * lands on the member home feed with a "Signed up successfully" toast.
- * Improvement kept from earlier: a profile summary card (big pink initial,
- * like the app's profile tab) is reachable via the profile nav icon.
+ * Post-signup member app, matching the reference recordings:
+ * - Home feed with "Signed up successfully" toast on arrival
+ * - Chats tab (BEFORE-HOURS / AFTERPARTY neon screens)
+ * - Create tab (HOST screen with themes + trending locations)
+ * - Profile tab (pink initial header, club, superlatives, passes, log out)
  */
 export default function SuccessPage() {
-  const { state, isStepAllowed } = useWizard();
+  const { state, dispatch, isStepAllowed } = useWizard();
   const router = useRouter();
+  const [tab, setTab] = useState<NavTab>("home");
   const [toastVisible, setToastVisible] = useState(true);
-  const [showProfile, setShowProfile] = useState(false);
 
   const allowed = isStepAllowed("success");
   const age = computeAge(state.dob);
@@ -34,96 +39,83 @@ export default function SuccessPage() {
 
   if (!allowed) return null;
 
-  return (
-    <main className="flex flex-1 flex-col animate-fade-up">
-      <div className="flex-1">
-          {showProfile ? (
-            /* Profile view — replicates the app's profile tab */
-            <div className="animate-fade-up pb-24">
-              <div className="relative flex h-[420px] items-end bg-[#F23D6D] px-5 pb-5">
-                <span
-                  aria-hidden
-                  className="absolute inset-0 flex items-center justify-center text-[260px] font-bold leading-none text-black/85"
-                >
-                  {(state.name || "E").charAt(0).toUpperCase()}
-                </span>
-                <div className="relative z-10">
-                  <p className="text-[30px] font-bold leading-tight">
-                    {state.name || "Extrovert"}{" "}
-                    {age !== null && (
-                      <span className="text-xl font-semibold text-white/70">{age}</span>
-                    )}
-                  </p>
-                  <p className="text-[15px] font-medium text-white/85">
-                    @{state.username || "member"}{" "}
-                    <span className="text-white/60">{state.pronouns}</span>
-                  </p>
-                </div>
-              </div>
-              <div className="pt-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400">
-                  Club
-                </p>
-                <div className="mt-2 flex items-center justify-between rounded-lg border border-white/70 px-4 py-3.5">
-                  <span className="text-[17px] font-semibold">Bronze Club Member</span>
-                  <span aria-hidden className="text-xl" style={{ color: "#CD7F32" }}>⬢</span>
-                </div>
-                <p className="mt-2.5 text-[13px] font-bold uppercase tracking-wide">
-                  🪙 {firstName} has 0 honorary vibe tokens!
-                </p>
-                {state.inviteCode && (
-                  <p className="mt-2 text-xs text-success">
-                    Invite code {state.inviteCode} applied ✓
-                  </p>
-                )}
-                <div className="mt-6 grid grid-cols-3 text-center">
-                  {["Events", "Superlatives", "HVTs"].map((k) => (
-                    <div key={k}>
-                      <p className="text-2xl font-bold">0</p>
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-                        {k}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => setShowProfile(false)}
-                  className="mt-8 h-[52px] w-full rounded-lg border border-neutral-600 text-[15px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-neutral-900"
-                >
-                  Back to feed
-                </button>
-              </div>
-            </div>
-          ) : (
-            <HomeFeed
-              member={{ name: firstName, tokens: 0 }}
-              onJoin={() =>
-                toast.success("You're on the list! See you at the party. 🎉")
-              }
-              activeTab="home"
-              onNavigate={(tab) => {
-                if (tab === "profile") setShowProfile(true);
-                else if (tab !== "home")
-                  toast("Chats and event hosting are outside this demo's scope.", {
-                    description: "The assessment covers the signup wizard only.",
-                  });
-              }}
-            />
-          )}
+  const handleLogout = () => {
+    dispatch({ type: "RESET" });
+    toast.success("Logged out. See you at the next party!");
+    router.push("/");
+  };
 
-        {/* "Signed up successfully" toast, like the recording */}
-        <div
-          role="status"
-          className={`fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[380px] -translate-x-1/2 transition-all duration-500 ${
-            toastVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
-          }`}
+  return (
+    <main className="flex flex-1 flex-col">
+      {tab === "home" && (
+        <HomeFeed
+          member={{ name: firstName, tokens: 0 }}
+          onJoin={() => toast.success("You're on the list! See you at the party. 🎉")}
+          activeTab="home"
+          onNavigate={setTab}
+        />
+      )}
+      {tab === "chats" && (
+        <ChatsView onCreate={() => setTab("create")} />
+      )}
+      {tab === "create" && <HostView />}
+      {tab === "profile" && (
+        <ProfileView
+          name={state.name}
+          username={state.username}
+          pronouns={state.pronouns}
+          age={age}
+          inviteCode={state.inviteCode}
+          onLogout={handleLogout}
+        />
+      )}
+
+      {/* Shared bottom nav for non-home tabs (HomeFeed renders its own) */}
+      {tab !== "home" && (
+        <nav
+          aria-label="Main"
+          className="fixed bottom-0 left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 border-t border-neutral-800 bg-black/95 px-6 py-2 backdrop-blur"
         >
-          <div className="flex items-center gap-3 rounded-xl border border-success/40 bg-[#0E1A12] px-4 py-3.5 shadow-2xl">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-success text-xs text-success">
-              ✓
-            </span>
-            <span className="text-[15px] font-medium">Signed up successfully</span>
+          <div className="flex items-center justify-between">
+            {(
+              [
+                { t: "home", label: "Home", Icon: HomeIcon },
+                { t: "chats", label: "Chats", Icon: ChatIcon },
+                { t: "create", label: "Create", Icon: CreateIcon },
+                { t: "profile", label: "Profile", Icon: ProfileIcon },
+              ] as { t: NavTab; label: string; Icon: typeof HomeIcon }[]
+            ).map(({ t, label, Icon }) => (
+              <button
+                key={t}
+                type="button"
+                aria-label={label}
+                aria-current={tab === t ? "page" : undefined}
+                onClick={() => setTab(t)}
+                className={`flex h-12 w-12 items-center justify-center rounded-lg transition-colors ${
+                  tab === t ? "text-white" : "text-neutral-500 hover:text-neutral-300"
+                }`}
+              >
+                <Icon className="h-[26px] w-[26px]" />
+              </button>
+            ))}
           </div>
+        </nav>
+      )}
+
+      {/* "Signed up successfully" toast, like the recording */}
+      <div
+        role="status"
+        className={`fixed bottom-24 left-1/2 z-50 w-[calc(100%-40px)] max-w-[380px] -translate-x-1/2 transition-all duration-500 ${
+          toastVisible
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-4 opacity-0"
+        }`}
+      >
+        <div className="flex items-center gap-3 rounded-xl border border-success/40 bg-[#0E1A12] px-4 py-3.5 shadow-2xl">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-success text-xs text-success">
+            ✓
+          </span>
+          <span className="text-[15px] font-medium">Signed up successfully</span>
         </div>
       </div>
     </main>
