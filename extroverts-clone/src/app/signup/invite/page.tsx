@@ -108,7 +108,7 @@ export default function InvitePage() {
 
         <div className="mt-auto flex flex-col gap-4 pt-8">
           <Button type="submit" loading={loading}>
-            Next
+            Sign Up
           </Button>
           {warning && (
             <Button type="button" variant="secondary" onClick={proceed}>

@@ -93,9 +93,7 @@ export default function DobPage() {
               : "border-neutral-600 hover:border-neutral-400 focus-visible:border-white"
           } ${age !== null && dateError === null ? "text-white" : "text-neutral-500"}`}
         >
-          {age !== null && dateError === null
-            ? `${age} years — born ${dob.day.padStart(2, "0")}/${dob.month.padStart(2, "0")}/${dob.year}`
-            : "Tap to enter your date of birth"}
+          {age !== null && dateError === null ? `${age}` : "Tap to enter your date of birth"}
         </button>
         <p className="mt-2 text-[14px] leading-snug text-neutral-400">
           We need your age to verify you&apos;re eligible and help others know
