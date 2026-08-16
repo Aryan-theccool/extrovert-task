@@ -50,7 +50,8 @@ const GATES: Record<StepName, (s: WizardState) => boolean> = {
   name: (s) => s.isVerified && s.completedSteps.includes("username"),
   dob: (s) => s.isVerified && s.completedSteps.includes("name"),
   pronouns: (s) => s.isVerified && s.completedSteps.includes("dob"),
-  invite: (s) => s.isVerified && s.completedSteps.includes("pronouns"),
+  review: (s) => s.isVerified && s.completedSteps.includes("pronouns"),
+  invite: (s) => s.isVerified && s.completedSteps.includes("review"),
   success: (s) => s.isVerified && s.completedSteps.includes("pronouns"),
 };
 

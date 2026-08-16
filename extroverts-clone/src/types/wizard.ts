@@ -5,6 +5,7 @@ export type StepName =
   | "name"
   | "dob"
   | "pronouns"
+  | "review"
   | "invite"
   | "success";
 

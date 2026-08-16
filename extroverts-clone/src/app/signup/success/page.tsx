@@ -111,8 +111,8 @@ export default function SuccessPage() {
             : "pointer-events-none translate-y-4 opacity-0"
         }`}
       >
-        <div className="flex items-center gap-3 rounded-xl border border-success/40 bg-[#0E1A12] px-4 py-3.5 shadow-2xl">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-success text-xs text-success">
+        <div className="flex items-center gap-3 rounded-xl border border-success/40 bg-[#0E1A12] px-4 py-3.5 shadow-2xl animate-slide-up-fade">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-success text-xs text-success font-bold animate-bounce-pop">
             ✓
           </span>
           <span className="text-[15px] font-medium">Signed up successfully</span>

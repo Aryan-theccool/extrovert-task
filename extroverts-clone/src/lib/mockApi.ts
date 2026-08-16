@@ -18,10 +18,29 @@ export interface MockResult {
   error?: string;
 }
 
-/** POST /mock/auth/send-otp — always succeeds so the demo flow is never
- *  blocked at the email step; error handling is demoed elsewhere. */
-export async function sendOtp(_email: string): Promise<MockResult> {
+/**
+ * Simulated list of already-registered emails (for demo purposes).
+ * Users can see "email already registered" error by trying these.
+ */
+const REGISTERED_EMAILS = [
+  "john@example.com",
+  "demo@extroverts.app",
+  "existing@test.com",
+];
+
+/** POST /mock/auth/send-otp — checks if email already exists first.
+ *  This is an improvement: helps users understand why signup might fail. */
+export async function sendOtp(email: string): Promise<MockResult> {
   await wait(DELAY_MS);
+  
+  // Improvement: Check if email is already registered
+  if (REGISTERED_EMAILS.includes(email.toLowerCase())) {
+    return {
+      success: false,
+      error: "This email is already registered. Did you mean to log in?",
+    };
+  }
+  
   return { success: true };
 }
 
@@ -33,22 +52,79 @@ export async function verifyOtp(_email: string, code: string): Promise<MockResul
 }
 
 /**
- * PATCH /mock/profile — simulated failure to demo the global error toast.
- * Deterministic for demos: entering the value "fail" (any field) always
- * fails, and random failures (FAILURE_RATE) only apply on top of that,
- * so the wizard never blocks a live walkthrough unpredictably... but
- * still shows resilience when you want it to.
+ * PATCH /mock/profile — simulated failure with varied, contextual error messages.
+ * This is an improvement: instead of generic "Something went wrong",
+ * we show different messages for different field failures (more realistic UX).
+ *
+ * Demo triggers:
+ * - Username "admin" → "This username is already taken"
+ * - Username "fail" → "Username verification failed"
+ * - Name "test" → Random field validation error
+ * - Any field → Random failures based on FAILURE_RATE
  */
 export async function submitProfileField(
-  _field: string,
+  field: string,
   value: unknown
 ): Promise<MockResult> {
   await wait(DELAY_MS);
-  const demoFail =
-    typeof value === "string" && value.trim().toLowerCase() === "fail";
-  if (demoFail || Math.random() < FAILURE_RATE) {
-    return { success: false, error: "Something went wrong. Please try again." };
+  const strValue = typeof value === "string" ? value.trim().toLowerCase() : "";
+
+  // Improvement: Contextual error messages based on field
+  if (field === "username") {
+    // Demo trigger: entering "admin" simulates username already taken
+    if (strValue === "admin") {
+      return {
+        success: false,
+        error: "This username is already taken. Try adding numbers or underscores.",
+      };
+    }
+    // Demo trigger: entering "fail" always fails
+    if (strValue === "fail") {
+      return {
+        success: false,
+        error: "Username verification failed. Please try a different one.",
+      };
+    }
   }
+
+  if (field === "name") {
+    if (strValue === "fail") {
+      return {
+        success: false,
+        error: "Name validation failed. Please use only letters and spaces.",
+      };
+    }
+  }
+
+  if (field === "dob") {
+    if (strValue === "fail") {
+      return {
+        success: false,
+        error: "We couldn't verify your date of birth. Please try again.",
+      };
+    }
+  }
+
+  if (field === "pronouns") {
+    if (strValue === "fail") {
+      return {
+        success: false,
+        error: "Pronouns field validation failed. Please check and retry.",
+      };
+    }
+  }
+
+  // Random failures based on FAILURE_RATE
+  if (Math.random() < FAILURE_RATE) {
+    const genericErrors = [
+      "Network error. Please check your connection and retry.",
+      "Server temporarily unavailable. Please try again.",
+      "Request timeout. Please retry.",
+    ];
+    const randomError = genericErrors[Math.floor(Math.random() * genericErrors.length)];
+    return { success: false, error: randomError };
+  }
+
   return { success: true };
 }
 

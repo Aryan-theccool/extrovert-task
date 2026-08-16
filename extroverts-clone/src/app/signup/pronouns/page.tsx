@@ -42,7 +42,7 @@ export default function PronounsPage() {
     }
     setField("pronouns", pronouns.trim());
     dispatch({ type: "COMPLETE_STEP", step: "pronouns" });
-    router.push("/signup/invite");
+    router.push("/signup/review");
   };
 
   return (
