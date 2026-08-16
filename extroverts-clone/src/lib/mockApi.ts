@@ -5,8 +5,9 @@
  * so loading spinners and global error toasts can be demonstrated.
  */
 
-const DELAY_MS = Number(process.env.NEXT_PUBLIC_MOCK_NETWORK_DELAY_MS ?? 1200);
-const FAILURE_RATE = Number(process.env.NEXT_PUBLIC_MOCK_FAILURE_RATE ?? 0.15);
+const DELAY_MS = Number(process.env.NEXT_PUBLIC_MOCK_NETWORK_DELAY_MS ?? 300);
+// DISABLED: No random failures for smooth demo flow
+const FAILURE_RATE = 0;
 
 /** Fixed dev OTP so the flow is reproducible on camera. */
 export const MOCK_OTP = "123456";
