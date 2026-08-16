@@ -18,12 +18,10 @@ export interface MockResult {
   error?: string;
 }
 
-/** POST /mock/auth/send-otp */
+/** POST /mock/auth/send-otp — always succeeds so the demo flow is never
+ *  blocked at the email step; error handling is demoed elsewhere. */
 export async function sendOtp(_email: string): Promise<MockResult> {
   await wait(DELAY_MS);
-  if (Math.random() < FAILURE_RATE) {
-    return { success: false, error: "Couldn't send the code. Please try again." };
-  }
   return { success: true };
 }
 
@@ -34,13 +32,21 @@ export async function verifyOtp(_email: string, code: string): Promise<MockResul
   return { success: false, error: "That code doesn't match. Give it another shot." };
 }
 
-/** PATCH /mock/profile — random failure to demo the global error toast */
+/**
+ * PATCH /mock/profile — simulated failure to demo the global error toast.
+ * Deterministic for demos: entering the value "fail" (any field) always
+ * fails, and random failures (FAILURE_RATE) only apply on top of that,
+ * so the wizard never blocks a live walkthrough unpredictably... but
+ * still shows resilience when you want it to.
+ */
 export async function submitProfileField(
   _field: string,
-  _value: unknown
+  value: unknown
 ): Promise<MockResult> {
   await wait(DELAY_MS);
-  if (Math.random() < FAILURE_RATE) {
+  const demoFail =
+    typeof value === "string" && value.trim().toLowerCase() === "fail";
+  if (demoFail || Math.random() < FAILURE_RATE) {
     return { success: false, error: "Something went wrong. Please try again." };
   }
   return { success: true };
