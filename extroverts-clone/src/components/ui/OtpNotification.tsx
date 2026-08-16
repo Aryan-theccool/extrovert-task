@@ -58,7 +58,7 @@ export default function OtpNotification({ email, delay = 1600 }: Props) {
                 M
               </span>
               <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-400">
-                Mail · now
+                Mail · now · simulated (frontend-only demo)
               </span>
             </div>
             <button

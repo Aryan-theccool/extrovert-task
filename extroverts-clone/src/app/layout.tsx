@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
+import DemoBadge from "@/components/ui/DemoBadge";
 // Poppins self-hosted via @fontsource (bundled at build time, no runtime request)
 import "@fontsource/poppins/400.css";
 import "@fontsource/poppins/500.css";
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="font-sans antialiased">
         {children}
+        <DemoBadge />
         <Toaster
           theme="dark"
           position="top-center"
